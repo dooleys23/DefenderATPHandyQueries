@@ -1,0 +1,21 @@
+# Find and project USB drive mounts
+DeviceEvents
+| where ActionType == "UsbDriveMounted"
+| extend LoggedOnUsers_=parse_json(AdditionalFields)['LoggedOnUsers'][0]
+| extend Volume_=parse_json(AdditionalFields)['Volume']
+| extend DriveLetter_=parse_json(AdditionalFields)['DriveLetter']
+| extend ProductName_=parse_json(AdditionalFields)['ProductName']
+| extend ProductRevision_=parse_json(AdditionalFields)['ProductRevision']
+| extend SerialNumber_=parse_json(AdditionalFields)['SerialNumber']
+| extend Manufacturer_=parse_json(AdditionalFields)['Manufacturer']
+| project Timestamp, ActionType, DeviceName, LoggedOnUsers_, Volume_, DriveLetter_, ProductName_, ProductRevision_, SerialNumber_, Manufacturer_
+
+# Get timestamp of most recent DeviceProcessEvent as a check-health
+DeviceProcessEvents
+| summarize arg_max(Timestamp, *) by DeviceName
+| project Timestamp, DeviceName
+
+# Get timestamp of most recent DeviceNetworkEvent as a network-health check
+DeviceNetworkEvents
+| summarize arg_max(Timestamp, *) by DeviceName
+| project Timestamp, DeviceName
