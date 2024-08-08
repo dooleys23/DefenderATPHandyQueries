@@ -84,3 +84,23 @@ DeviceTvmSecureConfigurationAssessment
 | mvexpand Compliant, NotCompliant
 | summarize Count = sum(iff(IsCompliant == 'Compliant', Compliant, NotCompliant)) by IsCompliant
 | project IsCompliant, Count
+
+
+
+
+
+
+// Get all security assessment metrics from defenders TVM modules with Configuration Impact level
+DeviceTvmSecureConfigurationAssessment
+| where Timestamp > ago(30d)
+| where IsApplicable == 1
+| join kind=inner DeviceTvmSecureConfigurationAssessmentKB on ConfigurationId
+| extend IsCompliant = iff(IsCompliant == 1, 'Compliant', 'NotCompliant')
+| where ConfigurationImpact >= 8
+| where ConfigurationId == 'scid-2030'
+| summarize arg_max(Timestamp, *) by DeviceName, ConfigurationId, ConfigurationImpact
+| summarize CompliantCount = countif(IsCompliant == 'Compliant'), NotCompliantCount = countif(IsCompliant == 'NotCompliant') by ConfigurationId, ConfigurationName, ConfigurationImpact
+| extend TotalCount = CompliantCount + NotCompliantCount
+| project CompliantCount, NotCompliantCount
+| extend CompliantLabel = 'Compliant', NotCompliantLabel = 'NotCompliant'
+| union (project CompliantLabel as Label, CompliantCount as Count), (project NotCompliantLabel as Label, NotCompliantCount as Count)
