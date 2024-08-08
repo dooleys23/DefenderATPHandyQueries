@@ -69,8 +69,6 @@ DeviceTvmSecureConfigurationAssessment
 
 
 
-How can I render this kql into a pie chart if the output is all in one row?
-
 // Get all security assessment metrics from defenders TVM modules with Configuration Impact level
 DeviceTvmSecureConfigurationAssessment
 | where Timestamp > ago(30d)
@@ -81,3 +79,8 @@ DeviceTvmSecureConfigurationAssessment
 | where ConfigurationId == 'scid-2030'
 | summarize arg_max(Timestamp, *) by DeviceName, ConfigurationId, ConfigurationImpact
 | summarize CompliantCount = countif(IsCompliant == 'Compliant'), NotCompliantCount = countif(IsCompliant == 'NotCompliant') by ConfigurationId, ConfigurationName, ConfigurationImpact
+| extend TotalCount = CompliantCount + NotCompliantCount
+| project ConfigurationId, ConfigurationName, ConfigurationImpact, Compliant = CompliantCount, NotCompliant = NotCompliantCount
+| mvexpand Compliant, NotCompliant
+| summarize Count = sum(iff(IsCompliant == 'Compliant', Compliant, NotCompliant)) by IsCompliant
+| project IsCompliant, Count
