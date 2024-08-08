@@ -555,3 +555,29 @@ DeviceEvents
 | extend ARKATotalHosts = totalHosts
 | project Table, ARKADevicesBeingLogged, ARKATotalHosts
 | render columnchart with (title = "Logged Devices in Last 30 Days", xaxis = Table, yaxis = ARKADevicesBeingLogged)
+
+
+
+
+
+let FirewallESSControls = dynamic(['scid-2070','scid-5007','scid-2072','scid-2071','scid-2073']);
+DeviceTvmSecureConfigurationAssessment
+| where Timestamp > ago(30d)
+| where IsApplicable == 1
+| join kind=inner (DeviceTvmSecureConfigurationAssessmentKB) on ConfigurationId
+| extend IsCompliant = iff(IsCompliant == 1, 'Compliant', 'NotCompliant')
+| where ConfigurationImpact >= 8
+| summarize arg_max(Timestamp, *) by DeviceName, ConfigurationId, ConfigurationImpact
+| summarize CompliantCount = countif(IsCompliant == 'Compliant'), NotCompliantCount = countif(IsCompliant == 'NotCompliant') by ConfigurationId, ConfigurationName, ConfigurationImpact
+| extend TotalCount = CompliantCount + NotCompliantCount
+| where ConfigurationId in (FirewallESSControls)
+| summarize TotalCompliant = sum(CompliantCount), TotalDevices = sum(TotalCount)
+| extend CompliancePercentage = todouble(TotalCompliant) / todouble(TotalDevices) * 100
+| project CompliancePercentage, NonCompliancePercentage = 100 - CompliancePercentage
+| extend Label = 'Firewall ESS Health'
+| project Label, CompliancePercentage, NonCompliancePercentage
+| render columnchart with ( kind=stacked, xcolumn=Label, series=NonCompliancePercentage, CompliancePercentage)
+
+
+
+
