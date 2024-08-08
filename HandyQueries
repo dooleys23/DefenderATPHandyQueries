@@ -19,3 +19,19 @@ DeviceProcessEvents
 DeviceNetworkEvents
 | summarize arg_max(Timestamp, *) by DeviceName
 | project Timestamp, DeviceName
+
+
+
+
+# Get all security assessment metrics from defenders TVM modules
+DeviceTvmSecureConfigurationAssessment
+| where Timestamp > ago(30d)
+| where IsApplicable == 1
+| join kind=inner DeviceTvmSecureConfigurationAssessmentKB on ConfigurationId
+| extend IsCompliant = iff(IsCompliant == 1, 'Compliant', 'NotCompliant')
+| summarize arg_max(Timestamp, *) by DeviceName, ConfigurationId
+| summarize CompliantCount = countif(IsCompliant == 'Compliant'), NotCompliantCount = countif(IsCompliant == 'NotCompliant') by ConfigurationId, ConfigurationName
+| extend TotalCount = CompliantCount + NotCompliantCount
+| extend CompliantPercentage = round(100.0 * CompliantCount / TotalCount, 2)
+| project ConfigurationId, ConfigurationName, CompliantCount, NotCompliantCount, CompliantPercentage
+| sort by ConfigurationId
