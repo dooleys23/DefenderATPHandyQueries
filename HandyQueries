@@ -219,3 +219,18 @@ DeviceTvmSecureConfigurationAssessment
 | mvexpand Status, Values
 | project Status, Values
 | render barchart
+
+
+
+
+Syntax error
+Error message
+Expected: ]
+How to resolve
+Fix syntax errors in your query
+Token
+CompliancePercentage
+Line
+16
+Position
+79
