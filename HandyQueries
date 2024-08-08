@@ -23,7 +23,7 @@ DeviceNetworkEvents
 
 
 
-# Get all security assessment metrics from defenders TVM modules
+// Get all security assessment metrics from defenders TVM modules
 DeviceTvmSecureConfigurationAssessment
 | where Timestamp > ago(30d)
 | where IsApplicable == 1
@@ -35,3 +35,49 @@ DeviceTvmSecureConfigurationAssessment
 | extend CompliantPercentage = round(100.0 * CompliantCount / TotalCount, 2)
 | project ConfigurationId, ConfigurationName, CompliantCount, NotCompliantCount, CompliantPercentage
 | sort by ConfigurationId
+
+// Get all security assessment metrics from defenders TVM modules with Configuration Impact level
+DeviceTvmSecureConfigurationAssessment
+| where Timestamp > ago(30d)
+| where IsApplicable == 1
+| join kind=inner DeviceTvmSecureConfigurationAssessmentKB on ConfigurationId
+| extend IsCompliant = iff(IsCompliant == 1, 'Compliant', 'NotCompliant')
+| where ConfigurationImpact >= 8
+| summarize arg_max(Timestamp, *) by DeviceName, ConfigurationId, ConfigurationImpact
+| summarize CompliantCount = countif(IsCompliant == 'Compliant'), NotCompliantCount = countif(IsCompliant == 'NotCompliant') by ConfigurationId, ConfigurationName, ConfigurationImpact
+| extend TotalCount = CompliantCount + NotCompliantCount
+| extend CompliantPercentage = round(100.0 * CompliantCount / TotalCount, 2)
+| project ConfigurationId, ConfigurationImpact, CompliantCount, NotCompliantCount, CompliantPercentage, ConfigurationName
+| sort by ConfigurationImpact desc , CompliantPercentage desc
+
+
+// Get all security assessment metrics from defenders TVM modules with Configuration Impact level
+DeviceTvmSecureConfigurationAssessment
+| where Timestamp > ago(30d)
+| where IsApplicable == 1
+| join kind=inner DeviceTvmSecureConfigurationAssessmentKB on ConfigurationId
+| extend IsCompliant = iff(IsCompliant == 1, 'Compliant', 'NotCompliant')
+| where ConfigurationImpact >= 8
+| summarize arg_max(Timestamp, *) by DeviceName, ConfigurationId, ConfigurationImpact
+| summarize CompliantCount = countif(IsCompliant == 'Compliant'), NotCompliantCount = countif(IsCompliant == 'NotCompliant') by ConfigurationId, ConfigurationName, ConfigurationImpact, OSPlatform
+| extend TotalCount = CompliantCount + NotCompliantCount
+| extend CompliantPercentage = round(100.0 * CompliantCount / TotalCount, 2)
+| project ConfigurationId, ConfigurationImpact, CompliantCount, NotCompliantCount, CompliantPercentage, ConfigurationName, OSPlatform
+| sort by ConfigurationImpact desc , CompliantPercentage desc
+
+
+
+
+
+How can I render this kql into a pie chart if the output is all in one row?
+
+// Get all security assessment metrics from defenders TVM modules with Configuration Impact level
+DeviceTvmSecureConfigurationAssessment
+| where Timestamp > ago(30d)
+| where IsApplicable == 1
+| join kind=inner DeviceTvmSecureConfigurationAssessmentKB on ConfigurationId
+| extend IsCompliant = iff(IsCompliant == 1, 'Compliant', 'NotCompliant')
+| where ConfigurationImpact >= 8
+| where ConfigurationId == 'scid-2030'
+| summarize arg_max(Timestamp, *) by DeviceName, ConfigurationId, ConfigurationImpact
+| summarize CompliantCount = countif(IsCompliant == 'Compliant'), NotCompliantCount = countif(IsCompliant == 'NotCompliant') by ConfigurationId, ConfigurationName, ConfigurationImpact
