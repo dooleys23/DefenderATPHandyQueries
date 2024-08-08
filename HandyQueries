@@ -282,3 +282,141 @@ DeviceTvmSecureConfigurationAssessment
     project Status = "Non-Compliant", Value = NonCompliancePercentage
 )
 | render barchart
+
+
+
+
+
+let totalHosts = 2000;
+let onboardedHosts = (DeviceInfo
+    | where TimeGenerated > ago(30d)
+    | where OnboardingStatus == 'Onboarded'
+    | distinct DeviceId
+);
+let DeviceFileEvents_ = (DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceFileEvents');
+let DeviceFileCertificateInfo_ = (DeviceFileCertificateInfo
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceFileCertificateInfo');
+let DeviceImageLoadEvents_ = (DeviceImageLoadEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceImageLoadEvents');
+let DeviceInfo_ = (DeviceInfo
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceInfo');
+let DeviceLogonEvents_ = (DeviceLogonEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceLogonEvents');
+let DeviceNetworkEvents_ = (DeviceNetworkEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceNetworkEvents');
+let DeviceNetworkInfo_ = (DeviceNetworkInfo
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceNetworkInfo');
+let DeviceProcessEvents_ = (DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceProcessEvents');
+let DeviceRegistryEvents_ = (DeviceRegistryEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceRegistryEvents');
+DeviceEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceEvents'
+| union DeviceFileEvents_, DeviceFileCertificateInfo_, DeviceImageLoadEvents_, DeviceInfo_, DeviceLogonEvents_, DeviceNetworkEvents_, DeviceNetworkInfo_, DeviceProcessEvents_, DeviceRegistryEvents_
+| extend ARKATotalHosts = totalHosts
+| project Table, ARKADevicesBeingLogged, ARKATotalHosts
+// | extend compliancePercentage = todouble(ARKADevicesBeingLogged)/todouble(totalHosts)*100
+// | project Table, ARKADevicesBeingLogged, ARKATotalHosts, compliancePercentage
+// | project Table, ARKADevicesBeingLogged
+// | extend compliancePercentage = todouble(ARKADevicesBeingLogged)/todouble(totaldevices)*100
+
+
+
+
+
+
+
+
+
+let totalHosts = 2000;
+let onboardedHosts = (DeviceInfo
+  | where TimeGenerated > ago(30d)
+  | where OnboardingStatus == 'Onboarded'
+  | distinct DeviceId
+);
+let DeviceFileEvents_ = (DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceFileEvents');
+let DeviceFileCertificateInfo_ = (DeviceFileCertificateInfo
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceFileCertificateInfo');
+let DeviceImageLoadEvents_ = (DeviceImageLoadEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceImageLoadEvents');
+let DeviceInfo_ = (DeviceInfo
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceInfo');
+let DeviceLogonEvents_ = (DeviceLogonEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceLogonEvents');
+let DeviceNetworkEvents_ = (DeviceNetworkEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceNetworkEvents');
+let DeviceNetworkInfo_ = (DeviceNetworkInfo
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceNetworkInfo');
+let DeviceProcessEvents_ = (DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceProcessEvents');
+let DeviceRegistryEvents_ = (DeviceRegistryEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceRegistryEvents');
+DeviceEvents
+| where TimeGenerated > ago(30d)
+| where DeviceId in (onboardedHosts)
+| summarize ARKADevicesBeingLogged=dcount(DeviceName)
+| extend Table='DeviceEvents'
+| union DeviceFileEvents_, DeviceFileCertificateInfo_, DeviceImageLoadEvents_, DeviceInfo_, DeviceLogonEvents_, DeviceNetworkEvents_, DeviceNetworkInfo_, DeviceProcessEvents_, DeviceRegistryEvents_
+| extend ARKATotalHosts = totalHosts
+| project Table, ARKADevicesBeingLogged, ARKATotalHosts
+// | render barchart 
+// | render columnchart with (title = "Logged Devices in Last 30 Days", xaxis = Table, yaxis = ARKADevicesBeingLogged) 
