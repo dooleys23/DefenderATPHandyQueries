@@ -581,3 +581,67 @@ DeviceTvmSecureConfigurationAssessment
 
 
 
+
+
+
+
+
+DeviceFileEvents
+| where FileName in (
+    "PelusaAC",
+    "gucache.exe",
+    "triggering GCLC",
+    "Odbcconf",
+    "PDF/TitleDHL.A",
+    "PDFinOLE1.",
+    "JarFil",
+    "DocShell",
+    "REGHIVE",
+    "OlefileCheck",
+    "Acrobat",
+    "RIPT:FlashOle",
+    "X97M/Synder!ic",
+    "Crimsonrat",
+    "MayContainPasswordHasÅ",
+    "RIPT:PDFinOLE1",
+    "ShortSeek.D",
+    "PDF/TitleDHL.A",
+    "Cryptomachinekeys",
+    "Java/ModsLib",
+    "TELEmotet.ENC",
+    "EncDoc.BSMpS"
+)
+or FilePath has_any (
+    "HSTR:MacrobeCException",
+    "ALF:Trojan:X97M/Synder!ic",
+    "Obfuse.JP!MTB5",
+    "Donoff.JR",
+    "DropperRVB",
+    "Crimsonrat",
+    "DownloadMalSpam.KB",
+    "Unknownmalware",
+    "BM_GLB_FILE",
+    "SCPT:Regsvr",
+    "LokiFigAB",
+    "JS/Run$.A",
+    "JS/Math.cos",
+    "JS/Base64.Body",
+    "MayContainPassword",
+    "TELEmotet.ENC",
+    "EncDoc.BSMpS",
+    "MSR",
+    "Adodb.vbsexe",
+    "VoorheesFDenc",
+    "RIPT:PDFinOLE1",
+    "JS/parseInt",
+    "Starstage 2",
+    "SWF/Neclu.D.3f",
+    "PDU",
+    "SWF/Pukabans.Bhr",
+    "TELEmotet.ENC",
+    "EncDoc.BSMpS",
+    "Exploit:CVE-2015-8651",
+    "SWFO",
+    "JS/APPDATA.exe",
+    "VirTool"
+)
