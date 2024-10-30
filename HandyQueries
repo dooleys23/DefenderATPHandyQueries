@@ -1,40 +1,39 @@
-Find all events within x minutes of a timestamp
-let targetTime = datetime(2024-10-22T12:14:30.8992227Z);
+// Find all events within x minutes of a timestamp
+let deviceName_ = '';
+let timeIncrement_ = timespan(10m);
+let targetTime = datetime(2024-10-18T03:26:00.0000000Z);
 let excelSpawn_ = (DeviceProcessEvents
-    | where TimeGenerated between (targetTime - timespan(1m) .. targetTime + timespan(5m))
-    | where DeviceName startswith "lp-0260"
-    | where ProcessId == '8300' or InitiatingProcessId == '8300'or InitiatingProcessParentId == '8300'
+    | where TimeGenerated between (targetTime - timeIncrement_ .. targetTime + timeIncrement_)
+    | where DeviceName == deviceName_
     | sort by TimeGenerated desc
 );
 let deviceEvents_ = (DeviceEvents
-    | where TimeGenerated between (targetTime - timespan(1m) .. targetTime + timespan(5m))
-    | where DeviceName startswith "lp-0260"
+    | where TimeGenerated between (targetTime - timeIncrement_ .. targetTime + timeIncrement_)
+    | where DeviceName == deviceName_
     | sort by TimeGenerated desc
 );
 let deviceRegistryEvents_ = (
     DeviceRegistryEvents
-    | where TimeGenerated between (targetTime - timespan(1m) .. targetTime + timespan(5m))
-    | where DeviceName startswith "lp-0260"
+    | where TimeGenerated between (targetTime - timeIncrement_ .. targetTime + timeIncrement_)
+    | where DeviceName == deviceName_
 );
 let deviceFileEvents_ = (
     DeviceFileEvents
-    | where TimeGenerated between (targetTime - timespan(1m) .. targetTime + timespan(5m))
-    | where DeviceName startswith "lp-0260"
+    | where TimeGenerated between (targetTime - timeIncrement_ .. targetTime + timeIncrement_)
+    | where DeviceName == deviceName_
 );
 let deviceImageLoadEvents_ = (
     DeviceImageLoadEvents  // Changed from deviceImageLoadEvents_
-    | where TimeGenerated between (targetTime - timespan(1m) .. targetTime + timespan(5m))
-    | where DeviceName startswith "lp-0260"
+    | where TimeGenerated between (targetTime - timeIncrement_ .. targetTime + timeIncrement_)
+    | where DeviceName == deviceName_
 );
 let deviceNetworkEvents_ = (
     DeviceNetworkEvents   // Changed from deviceNetworkEvents_
-    | where TimeGenerated between (targetTime - timespan(1m) .. targetTime + timespan(5m))
-    | where DeviceName startswith "lp-0260"
+    | where TimeGenerated between (targetTime - timeIncrement_ .. targetTime + timeIncrement_)
+    | where DeviceName == deviceName_
 );
 excelSpawn_
 | union deviceEvents_, deviceRegistryEvents_, deviceFileEvents_, deviceImageLoadEvents_, deviceNetworkEvents_
-// | extend cmd_ = AdditionalFields.[0]['Command']
-// | extend cmd_ = parse
 | project-reorder Type, TimeGenerated, ActionType, InitiatingProcessParentFileName, InitiatingProcessCommandLine, FileName, ProcessCommandLine, RemoteUrl, AdditionalFields
 | sort by TimeGenerated asc
 
